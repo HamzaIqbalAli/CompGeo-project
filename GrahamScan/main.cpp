@@ -6,13 +6,25 @@
 using namespace std;
 vector <pair<float,float> > points;
 int num_of_points,left_most;
-bool isColl(int a,int b, int c)
+bool isColl(int p1, int p2)
 {
     float s1,s2;
-    s1 = (points[b].second - points[a].second) * (points[b].first - points[a].first);
-    s2 = (points[c].second - points[a].second) * (points[c].first - points[a].first);
-    if(s1==s2)  return 0;
-    else    return 1;
+    s1 = (points[p2].second-points[p1].second) * (points[p1].first-points[left_most].first);
+    s2 = (points[p1].second-points[left_most].second) * (points[p2].first-points[p1].first);
+    if(s1==s2)return 1;
+    else return 0;
+}
+
+void removeDegeneracies()
+{
+    int i=1;
+    while(i<points.size()-1)
+    {
+        if(isColl(i,i+1)==1)
+            points.erase(points.begin()+i);
+        else
+            i++;
+    }
 }
 
 int findOrientation(int p1,int p2,int p3)
@@ -69,26 +81,22 @@ void GrahamScan()
         if((points[i].first<points[left_most].first) || (points[i].first==points[left_most].first && points[i].second<points[left_most].second))
             left_most=i;
     }
+    cout<<"\n";
     swapPoints(left_most);
     left_most=0;
     sort(points.begin()+1,points.end(),compareFunction);
-    int newn = 1;
-    for(i=1;i<num_of_points;i++)
-    {
-        while(i<num_of_points-1 && isColl(left_most,i,i+1)==0)
-        {
-            i++;
-        }
-        points[newn]=points[i];
-        newn++;
-    }
-    //------------------*/
-    //if(sz<3)    return
+    for(i=0;i<num_of_points;i++)
+        cout<<points[i].first<<" "<<points[i].second<<"\n";
+    removeDegeneracies();
+    cout<<"\n";
+    int newn = points.size();
+    /*for(i=0;i<newn;i++)
+        cout<<points[i].first<<" "<<points[i].second<<"\n";*/
+    //if(newn<3)    return;
     stack <int> s;
     s.push(left_most);
     s.push(1);
     s.push(2);
-
     for(i=3;i<newn;i++)
     {
         while(findOrientation(firstpoint(s),s.top(),i)!=1)
@@ -120,4 +128,3 @@ int main()
     GrahamScan();
     return 0;
 }
-
